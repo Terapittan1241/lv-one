@@ -147,7 +147,7 @@ function showHomeButton() {
   if (!homeButton) {
     homeButton = createButton("ホームに戻る");
     homeButton.style('font-size', '28px');
-    homeButton.position(1000,800)
+    homeButton.position(1000,700)
     homeButton.mousePressed(() => {
       showHomeScreen = true;
       resetGame();
