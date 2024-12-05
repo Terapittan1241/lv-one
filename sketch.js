@@ -3,37 +3,61 @@ let score = 0;
 let gameOver = false;
 let startTime;
 let timeLimit = 20000; // 20秒
-let words = ["[apple]", "[banana]", "[grapes]"];
+let level = ""; // 選択された難易度
+let wordsEasy = ["[apple]", "[banana]", "[grapes]"];
+let wordsMedium = ["[apple]", "[banana]", "[grapes]", "[melon]", "[carrot]", "[peach]", "[tomato]"];
 let displayedWord = "";
-let wordChangeInterval = 2000; 
+let wordChangeInterval = 3000;
 let lastWordChangeTime = 0;
 let countdownStartTime;
 let gameStarted = false;
+let showHomeScreen = true; // ホーム画面を表示するか
+let homeButton; // ホームに戻るボタン
+let easyButton, mediumButton; // 初級・中級ボタン
 
-let redBallImage, yellowBallImage, blueBallImage; // 画像用変数
+let redBallImage, yellowBallImage, blueBallImage, melonImage, carrotImage, peachImage, tomatoImage;
 
 function preload() {
-  // ボール画像を読み込む
-  redBallImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/%E3%81%82.png'); // 赤ボール用画像
-  yellowBallImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/%E3%81%82%E3%81%84.png'); // 黄色ボール用画像
-  blueBallImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/%E3%81%82%E3%81%84%E3%81%86.png'); // 青ボール用画像
-  
+  redBallImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/%E3%81%82.png');
+  yellowBallImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/%E3%81%82%E3%81%84.png');
+  blueBallImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/%E3%81%82%E3%81%84%E3%81%86.png');
+  melonImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/g.png');
+  carrotImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/b.jpg');
+  peachImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/f.png');
+  tomatoImage = loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/d.png');
 }
 
 function setup() {
   createCanvas(400, 400);
-  countdownStartTime = millis();
-  displayedWord = random(words);
-
-  balls.push(new Ball("red"));
-  balls.push(new Ball("yellow"));
-  balls.push(new Ball("blue"));
-
-  textFont('sans-serif');
-  textStyle(BOLD);
+  createButtons();
 }
 
 function draw() {
+  if (showHomeScreen) {
+    drawHomeScreen();
+  } else {
+    drawGame();
+  }
+}
+
+function drawHomeScreen() {
+  background(135, 206, 235);
+  textAlign(CENTER, CENTER);
+  textSize(36);
+  fill(0);
+  text("Welcome to the Game!", width / 2, height / 2 - 80);
+  textSize(24);
+  text("Select Difficulty to Start", width / 2, height / 2 - 40);
+
+  // ボタンをホーム画面でのみ表示
+  easyButton.show();
+  mediumButton.show();
+
+  // ホームボタンを非表示にする
+  if (homeButton) homeButton.hide();
+}
+
+function drawGame() {
   drawSkyBackground();
 
   if (!gameStarted) {
@@ -58,14 +82,15 @@ function draw() {
     fill(0);
     textAlign(CENTER, CENTER);
     if (score >= 10) {
-      text("You Win!", width / 2, height / 2);
+      text("You Win!", width / 2, height / 2 - 20);
     } else {
       fill(255, 0, 0);
-      text("GAME OVER", width / 2, height / 2 - 50);
-      textSize(24);
-      fill(0);
-      text("Your Score: " + score, width / 2, height / 2);
+      text("GAME OVER", width / 2, height / 2 - 20);
     }
+    textSize(24);
+    fill(0);
+    text("Your Score: " + score, width / 2, height / 2 + 20);
+    showHomeButton();
     noLoop();
     return;
   }
@@ -73,7 +98,6 @@ function draw() {
   for (let i = 0; i < balls.length; i++) {
     balls[i].fall();
     balls[i].display();
-
     if (balls[i].y > height) {
       balls[i].reset();
     }
@@ -95,43 +119,93 @@ function draw() {
   }
 }
 
+function mousePressed() {
+  if (!showHomeScreen) {
+    for (let i = 0; i < balls.length; i++) {
+      if (balls[i].isClicked(mouseX, mouseY)) {
+        score++;
+        balls[i].reset();
+      }
+    }
+  }
+}
+
 function displayRandomWord() {
+  let wordSet = level === "easy" ? wordsEasy : wordsMedium;
+
   if (millis() - lastWordChangeTime > wordChangeInterval) {
-    displayedWord = random(words);
+    displayedWord = random(wordSet);
     lastWordChangeTime = millis();
   }
-  
+
   textSize(36);
   textAlign(CENTER, TOP);
-  if (displayedWord === "[apple]") {
-    fill(0);
-    stroke(255, 0, 0);
-  } else if (displayedWord === "[banana]") {
-    fill(255, 255, 0);
-    stroke(0);
-  } else if (displayedWord === "[grape]") {
-    fill(0);
-    stroke(0, 0, 255);
-  }
-  
+  fill(0);
   strokeWeight(4);
   text(displayedWord, width / 2, 20);
 }
 
-function mousePressed() {
-  for (let i = 0; i < balls.length; i++) {
-    if (balls[i].isClicked(mouseX, mouseY)) {
-      if (
-        (displayedWord === "[apple]" && balls[i].color === "red") ||
-        (displayedWord === "[banana]" && balls[i].color === "yellow") ||
-        (displayedWord === "[grape]" && balls[i].color === "blue")
-      ) {
-        score += 1;
-      } else {
-        score -= 1;
-      }
-      balls[i].reset();
-    }
+function createButtons() {
+  easyButton = createButton("初級");
+  mediumButton = createButton("中級");
+
+  easyButton.position(width / 2 - 100, height / 2 + 20);
+  mediumButton.position(width / 2 + 10, height / 2 + 20);
+
+  easyButton.style('font-size', '24px');
+  mediumButton.style('font-size', '24px');
+
+  easyButton.mousePressed(() => setLevel("easy"));
+  mediumButton.mousePressed(() => setLevel("medium"));
+
+  // ボタンがゲーム画面に表示されないように
+  easyButton.hide();
+  mediumButton.hide();
+}
+
+function showHomeButton() {
+  if (!homeButton) {
+    homeButton = createButton("ホームに戻る");
+    homeButton.position(width / 2 - 50, height / 2 + 60);
+    homeButton.style('font-size', '20px');
+    homeButton.mousePressed(() => {
+      showHomeScreen = true;
+      resetGame();
+      loop();
+    });
+  }
+  homeButton.show();
+}
+
+function setLevel(selectedLevel) {
+  level = selectedLevel;
+  showHomeScreen = false;
+  resetGame();
+}
+
+function resetGame() {
+  score = 0;
+  gameOver = false;
+  gameStarted = false;
+  countdownStartTime = millis();
+  balls = [];
+
+  // ゲームが始まったらボタンを非表示にする
+  easyButton.hide();
+  mediumButton.hide();
+
+  if (level === "easy") {
+    balls.push(new Ball("red"));
+    balls.push(new Ball("yellow"));
+    balls.push(new Ball("blue"));
+  } else if (level === "medium") {
+    balls.push(new Ball("red"));
+    balls.push(new Ball("yellow"));
+    balls.push(new Ball("blue"));
+    balls.push(new Ball("melon"));
+    balls.push(new Ball("carrot"));
+    balls.push(new Ball("peach"));
+    balls.push(new Ball("tomato"));
   }
 }
 
@@ -143,14 +217,15 @@ class Ball {
 
   display() {
     let img;
-    if (this.color === "red") {
-      img = redBallImage;
-    } else if (this.color === "yellow") {
-      img = yellowBallImage;
-    } else if (this.color === "blue") {
-      img = blueBallImage;
-    }
-    image(img, this.x, this.y, this.size, this.size); // 画像を描画
+    if (this.color === "red") img = redBallImage;
+    else if (this.color === "yellow") img = yellowBallImage;
+    else if (this.color === "blue") img = blueBallImage;
+    else if (this.color === "melon") img = melonImage;
+    else if (this.color === "carrot") img = carrotImage;
+    else if (this.color === "peach") img = peachImage;
+    else if (this.color === "tomato") img = tomatoImage;
+
+    image(img, this.x, this.y, this.size, this.size);
   }
 
   fall() {
@@ -165,7 +240,7 @@ class Ball {
   reset() {
     this.x = random(20, width - 20);
     this.y = random(-100, -20);
-    this.size = 40; // 画像の大きさに合わせて調整
+    this.size = 40;
     this.speed = random(1, 2);
   }
 }
