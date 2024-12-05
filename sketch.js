@@ -1,6 +1,7 @@
 let canvasSize = 600;
 let balls = [];
 let score = 0;
+let clicks = 0; // クリック数を記録
 let gameOver = false;
 let startTime;
 let timeLimit = 20000;
@@ -80,9 +81,10 @@ function drawGame() {
     textSize(48);
     fill(0);
     textAlign(CENTER, CENTER);
-    text(score >= 10 ? "You Win!" : "GAME OVER", width / 2, height / 2 - 40);
+    text("時間切れ!", width / 2, height / 2 - 40);
     textSize(32);
-    text("Your Score: " + score, width / 2, height / 2 + 40);
+    text(`あなたの点数: ${score}`, width / 2, height / 2 + 20);
+    
     showHomeButton();
     noLoop();
     return;
@@ -101,12 +103,13 @@ function drawGame() {
   textSize(32);
   textAlign(LEFT, TOP);
   text("Score: " + score, 20, 20);
-  text("Time: " + (20 - Math.floor(elapsedTime / 1000)), 20, 60);
-  if (score >= 10) gameOver = true;
+  text("Clicks: " + clicks, 20, 60); // ゲーム中もクリック数を表示
+  text("Time: " + (20 - Math.floor(elapsedTime / 1000)), 20, 100);
 }
 
 function mousePressed() {
   if (!showHomeScreen) {
+    clicks++; // クリック回数をカウント
     balls.forEach(ball => {
       if (ball.isClicked(mouseX, mouseY)) {
         if (ball.label === displayedWord) {
@@ -135,10 +138,10 @@ function createButtons() {
   mediumButton = createButton("中級");
   easyButton.style('font-size', '32px');
   mediumButton.style('font-size', '32px');
-  easyButton.size(200,100)
-  mediumButton.size(200,100)
-  easyButton.position(450,400)
-  mediumButton.position(670,400)
+  easyButton.size(200, 100);
+  mediumButton.size(200, 100);
+  easyButton.position(450, 400);
+  mediumButton.position(670, 400);
   easyButton.mousePressed(() => setLevel("easy"));
   mediumButton.mousePressed(() => setLevel("medium"));
 }
@@ -147,7 +150,7 @@ function showHomeButton() {
   if (!homeButton) {
     homeButton = createButton("ホームに戻る");
     homeButton.style('font-size', '28px');
-    homeButton.position(550,450)
+    homeButton.position(550, 450);
     homeButton.mousePressed(() => {
       showHomeScreen = true;
       resetGame();
@@ -166,6 +169,7 @@ function setLevel(selectedLevel) {
 
 function resetGame() {
   score = 0;
+  clicks = 0; // クリック数をリセット
   gameOver = false;
   gameStarted = false;
   countdownStartTime = millis();
