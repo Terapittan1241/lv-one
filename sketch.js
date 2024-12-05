@@ -3,7 +3,7 @@ let score = 0;
 let gameOver = false;
 let startTime;
 let timeLimit = 20000; // 20秒
-let words = ["[apple]", "[banana]", "[grape]"];
+let words = ["[apple]", "[banana]", "[grapes]"];
 let displayedWord = "";
 let wordChangeInterval = 2000; 
 let lastWordChangeTime = 0;
