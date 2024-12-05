@@ -137,8 +137,8 @@ function createButtons() {
   mediumButton.style('font-size', '32px');
   easyButton.size(200,100)
   mediumButton.size(200,100)
-  easyButton.position(900,600)
-  mediumButton.position(1400,600)
+  easyButton.position(500,300)
+  mediumButton.position(800,300)
   easyButton.mousePressed(() => setLevel("easy"));
   mediumButton.mousePressed(() => setLevel("medium"));
 }
@@ -147,7 +147,7 @@ function showHomeButton() {
   if (!homeButton) {
     homeButton = createButton("ホームに戻る");
     homeButton.style('font-size', '28px');
-    homeButton.position(1000,700)
+    homeButton.position(650,350)
     homeButton.mousePressed(() => {
       showHomeScreen = true;
       resetGame();
