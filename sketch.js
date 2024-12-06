@@ -1,13 +1,12 @@
 let canvasSize = 600;
 let balls = [];
 let score = 0;
-let clicks = 0; // クリック数を記録
 let gameOver = false;
 let startTime;
 let timeLimit = 20000;
 let level = "";
-let wordsEasy = ["apple", "banana", "grapes"];
-let wordsMedium = ["apple", "banana", "grapes", "melon", "carrot", "peach", "tomato"];
+let wordsEasy = ["apple", "banana", "melon", "carrot", "peach", "tomato","corn","onion","orange","potato"];
+let wordsMedium = ["cherry", "sausage", "pineapple", "grapes", "strawberry", "mushroom", "cabbage"];
 let displayedWord = "";
 let wordChangeInterval = 3000;
 let lastWordChangeTime = 0;
@@ -26,7 +25,17 @@ function preload() {
     melon: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/g.png'),
     carrot: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/b.png'),
     peach: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/f.png'),
-    tomato: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/d.png')
+    potato: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/a.png'),
+    orange: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/e.jpg'),
+    corn: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/h.jpg'),
+    onion: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/i.jpg'),
+    tomato: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/d.png'),
+    cherry: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/k.jpg'),
+    sausage: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/l.jpg'),
+    pineapple: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/m1.png'),
+    strawberry: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/n.jpg'),
+    mushroom: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/o.jpg'),
+    cabbage: loadImage('https://raw.githubusercontent.com/Terapittan1241/lv-one/main/p.jpg')
   };
 }
 
@@ -81,10 +90,9 @@ function drawGame() {
     textSize(48);
     fill(0);
     textAlign(CENTER, CENTER);
-    text("時間切れ!", width / 2, height / 2 - 40);
+    text(score >= 10 ? "You Win!" : "GAME OVER", width / 2, height / 2 - 40);
     textSize(32);
-    text(`あなたの点数: ${score}`, width / 2, height / 2 + 20);
-    
+    text("Your Score: " + score, width / 2, height / 2 + 40);
     showHomeButton();
     noLoop();
     return;
@@ -103,21 +111,27 @@ function drawGame() {
   textSize(32);
   textAlign(LEFT, TOP);
   text("Score: " + score, 20, 20);
-  text("Clicks: " + clicks, 20, 60); // ゲーム中もクリック数を表示
-  text("Time: " + (20 - Math.floor(elapsedTime / 1000)), 20, 100);
+  text("Time: " + (20 - Math.floor(elapsedTime / 1000)), 20, 60);
+  if (score >= 10) gameOver = true;
 }
 
 function mousePressed() {
   if (!showHomeScreen) {
-    clicks++; // クリック回数をカウント
+    let clickedAnyBall = false;
+
     balls.forEach(ball => {
       if (ball.isClicked(mouseX, mouseY)) {
+        clickedAnyBall = true;
         if (ball.label === displayedWord) {
-          score++;
+          score++; // 正解時にスコア+1
+        } else {
+          score--; // 不正解時にスコア-1
         }
-        ball.reset();
+        ball.reset(); // ボールをリセット
       }
     });
+
+    score = max(score, 0); // スコアが0未満にならないよう制御
   }
 }
 
@@ -138,10 +152,10 @@ function createButtons() {
   mediumButton = createButton("中級");
   easyButton.style('font-size', '32px');
   mediumButton.style('font-size', '32px');
-  easyButton.size(200, 100);
-  mediumButton.size(200, 100);
-  easyButton.position(450, 400);
-  mediumButton.position(670, 400);
+  easyButton.size(200,100)
+  mediumButton.size(200,100)
+  easyButton.position(370,300)
+  mediumButton.position(750,300)
   easyButton.mousePressed(() => setLevel("easy"));
   mediumButton.mousePressed(() => setLevel("medium"));
 }
@@ -150,7 +164,7 @@ function showHomeButton() {
   if (!homeButton) {
     homeButton = createButton("ホームに戻る");
     homeButton.style('font-size', '28px');
-    homeButton.position(550, 450);
+    homeButton.position(560,400)
     homeButton.mousePressed(() => {
       showHomeScreen = true;
       resetGame();
@@ -169,14 +183,13 @@ function setLevel(selectedLevel) {
 
 function resetGame() {
   score = 0;
-  clicks = 0; // クリック数をリセット
   gameOver = false;
   gameStarted = false;
   countdownStartTime = millis();
   balls = [];
   easyButton.hide();
   mediumButton.hide();
-  let colors = level === "easy" ? ["apple", "banana", "grapes"] : ["apple", "banana", "grapes", "melon", "carrot", "peach", "tomato"];
+  let colors = level === "easy" ? ["apple", "banana", "melon", "carrot", "peach", "tomato","corn","onion","orange","potato"] : ["cherry", "sausage", "pineapple", "grapes", "strawberry", "mushroom", "cabbage"];
   colors.forEach(color => balls.push(new Ball(color)));
 }
 
