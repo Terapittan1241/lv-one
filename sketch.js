@@ -154,8 +154,8 @@ function createButtons() {
   mediumButton.style('font-size', '32px');
   easyButton.size(200,100)
   mediumButton.size(200,100)
-  easyButton.position(370,300)
-  mediumButton.position(750,300)
+  easyButton.position(370,400)
+  mediumButton.position(750,400)
   easyButton.mousePressed(() => setLevel("easy"));
   mediumButton.mousePressed(() => setLevel("medium"));
 }
